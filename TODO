@@ -1,0 +1,27 @@
+--------------------------------------------------------------------------------
+
+                             Hyenae Todo-List
+
+--------------------------------------------------------------------------------
+
+  Hyenae
+    Advanced Network Packet Generator
+
+  Copyright (C) 2009 - 2010 Robin Richter
+
+  Contact  : richterr@users.sourceforge.net
+  Homepage : http://sourceforge.net/projects/hyenae/
+
+--------------------------------------------------------------------------------
+
+  High Priority
+    * Add GUI
+
+  Medium Priority
+    * Add SNMP support
+    * Add NDP support
+
+  Low Priority
+    * Client/Daemon conversation encryption (SSL)
+
+--------------------------------------------------------------------------------

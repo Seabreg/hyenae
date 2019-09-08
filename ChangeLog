@@ -1,0 +1,111 @@
+--------------------------------------------------------------------------------
+
+                             Hyenae Change-Log
+
+--------------------------------------------------------------------------------
+
+  Hyenae
+    Advanced Network Packet Generator
+
+  Copyright (C) 2009 - 2010 Robin Richter
+
+  Contact  : richterr@users.sourceforge.net
+  Homepage : http://sourceforge.net/projects/hyenae/
+
+--------------------------------------------------------------------------------
+
+  Version 0.36-1 (Dec. 6th, 2010)
+    * Bug fixes
+    * Code refactoring
+    * Updated / corrected documentation
+    * Added HyenaeFE frontend stop condition support
+
+  Version 0.35-3 (Nov. 29th, 2010)
+    * Fixed send delay
+    * Fixed byte padding on ARP attacks
+    * Fixed attack assistant usage comparison
+    * Updated documentation
+
+  Version 0.35-2 (Sep. 4th, 2010)
+    * Bug fixes
+    * Updated documentation
+    * Extended command line usage infos
+    * Applied memory leak patch by Archie Andrews
+
+  Version 0.35-1 (Oct. 1st, 2009)
+    * Bug fixes
+    * Fixed build warnings
+    * Updated documentation
+    * Added Cisco HSRP-Hello support
+    * Added Cisco HSRP-Coup support
+    * Added Cisco HSRP-Resign support
+    * Refactored attack blocking handler
+    * Refactored default value assignment
+    * Made opcode (code) argument optional
+    * Refactored attack parameter structure
+    * Applied DNS patch by Archie Andrews
+    * Removed DNS query URL format validation
+    * Added Cisco HSRP active router hijacking to attack assistant
+    * Daemon now binds to every capable network interface by default
+
+  Version 0.34-1 (Sep. 14th, 2009)
+    * Bug fixes
+    * Updated documentation
+    * Added debian run script
+    * Added PPPoE-Discover support
+    * Added PPPoE session initiation flood to attack assistant
+    * Added Blind PPPoE session termination to attack assistant
+    * -l now lists interface descriptions instead of names (Windows)
+
+  Version 0.33-1 (Aug. 31st, 2009)
+    * Bug fixes
+    * Fixed build warnings
+    * Added ICMPv6-Echo support
+    * Added ICMPv6-Echo flood to attack assistant
+
+  Version 0.32-1 (Aug. 24th, 2009)
+    * Added DNS-Query attack support
+    * Added DNS-Query flood to attack assistant
+    * Fixed DHCP source/destination pattern randomization
+
+  Version 0.31-1 (Aug. 14th, 2009)
+    * Bug fixes
+    * Improved attack assistant
+    * Extended / fixed documentation
+    * Added TCP-Land attack to attack assistant
+    * Added ICMP-Smurf attack to attack assistant
+    * Changed daemon max. clients argument (from -C to -m)
+
+  Version 0.30-1 (Jul. 25th, 2009)
+    * Added attack assistant
+    * Minor code refactoring
+    * Updated / fixed documentation
+    * Made randomization on ARP attacks equal for source and sender HW-Address
+
+  Version 0.29-1 (Mar. 16th, 2009)
+    * Minor code refactoring
+    * Rearranged / extended / corrected documentation
+    * Added TCP based ICMP "Destination Unreachable" support
+
+  Version 0.28-1 (Mar. 2nd, 2009)
+    * Added DHCP-Request attack support
+    * Added DHCP-Release attack support
+    * Added DHCP-Discover attack support
+    * Changed Cold-Run argument (from -n to -N)
+    * Changed address pattern argument (from -T to -D)
+    * Fixed "No or unknown attack type given" error message
+
+  Version 0.27-1 (Feb. 23rd, 2009)
+    * Added TODO file
+    * Added HOWTO file
+    * Refactored protocol wrapping
+    * Fixed possible integer truncations
+    * Added usage info on unknown argument
+    * Refactored daemon attack request logging
+    * Stripped remote attack request processing
+    * Documentation corrections and improvements by Siji Kurien
+
+  Version 0.26-1 (Jan. 30th, 2009)
+    * First public release
+
+--------------------------------------------------------------------------------

